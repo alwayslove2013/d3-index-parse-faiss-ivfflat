@@ -1,1 +1,1 @@
-export {default as foo} from "./src/foo";
+export {default as indexParser} from "./src/indexParser";
