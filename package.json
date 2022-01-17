@@ -1,28 +1,37 @@
 {
-  "name": "d3-foo",
+  "name": "d3-index-parser-faiss-ivfflat",
   "version": "0.0.1",
-  "description": "{DESCRIPTION}",
+  "description": "Parse the index file of faiss",
   "keywords": [
     "d3",
-    "d3-module"
+    "d3-module",
+    "index",
+    "anns",
+    "faiss",
+    "ivf",
+    "ivfflat"
   ],
   "license": "BSD-3-Clause",
-  "main": "build/d3-foo.js",
+  "main": "build/d3-index-parser-faiss-ivfflat.js",
   "jsnext:main": "index",
-  "homepage": "https://github.com/{USERNAME}/d3-foo",
+  "homepage": "https://github.com/alwayslove2013/d3-index-parse-faiss-ivfflat",
   "repository": {
     "type": "git",
-    "url": "https://github.com/{USERNAME}/d3-foo.git"
+    "url": "https://github.com/alwayslove2013/d3-index-parse-faiss-ivfflat.git"
   },
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup -f umd -n d3 -o build/d3-foo.js -- index.js",
+    "build": "rm -rf build && mkdir build && rollup -c ./rollup.config.js",
+    "pretest": "yarn run build",
     "test": "tape 'test/**/*-test.js'",
-    "prepublish": "npm run test && uglifyjs build/d3-foo.js -c -m -o build/d3-foo.min.js",
-    "postpublish": "zip -j build/d3-foo.zip -- LICENSE README.md build/d3-foo.js build/d3-foo.min.js"
+    "prepublish": "npm run test && uglifyjs build/d3-index-parser-faiss-ivfflat.js -c -m -o build/d3-index-parser-faiss-ivfflat.min.js",
+    "postpublish": "zip -j build/d3-index-parser-faiss-ivfflat.zip -- LICENSE README.md build/d3-index-parser-faiss-ivfflat.js build/d3-index-parser-faiss-ivfflat.min.js"
   },
   "devDependencies": {
     "rollup": "0.27",
     "tape": "4",
     "uglify-js": "2"
+  },
+  "dependencies": {
+    "d3-fetch": "^3.0.1"
   }
 }
