@@ -21,3 +21,21 @@ export const num2MetricType = (num) => {
   }
   return metrictype;
 };
+
+
+export const DirectMapType = {
+  NoMap: 0,    // default
+  Array: 1,    // sequential ids (only for add, no add_with_ids)
+  Hashtable: 2 // arbitrary ids
+}
+
+export const num2DirectMapType = (num) => {
+  let directMapType = "NoMap";
+
+  for (let type in DirectMapType) {
+    if (DirectMapType[type] === num) {
+      directMapType = type;
+    }
+  }
+  return directMapType;
+}
