@@ -22,15 +22,6 @@ class MiniIndex {
     console.log("index", index);
     return 40;
   }
-  readH() {
-    const uint8Array = [];
-    for (let i = 0; i < 4; i++) {
-      uint8Array.push(this.dataview.getUint8(this.p, true));
-      this.p += 1;
-    }
-    const h = uint8toChars(uint8Array);
-    return h;
-  }
   readInt8() {
     const int8 = this.dataview.getInt8(this.p, true);
     this.p += 1;
@@ -58,11 +49,6 @@ class MiniIndex {
       console.warn(int64, "exceeds MAX_SAFE_INTEGER. Precision may be lost");
     return int64;
   }
-  readFloat64() {
-    const float64 = this.dataview.getFloat64(this.p, true);
-    this.p += 8;
-    return float64;
-  }
   readFloat32Array(n) {
     const res = new Float32Array(this.data.slice(this.p, this.p + n * 4));
     this.p += n * 4;
@@ -71,6 +57,11 @@ class MiniIndex {
   readInt64Array(n) {
     const res = generateArray(n).map((_) => this.readInt64());
     return res;
+  }
+  readH() {
+    const uint8Array = generateArray(4).map((_) => this.readUint8());
+    const h = uint8toChars(uint8Array);
+    return h;
   }
   readDummy() {
     const dummy = this.readInt64();
@@ -135,8 +126,10 @@ class MiniIndex {
     // const codes = new Float32Array(this.data.slice(this.p, this.p + size * 4));
     // // console.log(codes.filter((_, i) => i % index.d === 0).sort());
     // this.p += size * 4;
-    const codes = generateArray(index.ntotal).map(_ => this.readFloat32Array(index.d))
-    
+    const codes = generateArray(index.ntotal).map((_) =>
+      this.readFloat32Array(index.d)
+    );
+
     index.codes = codes;
   }
   readArrayInvertedListsSizes(inv) {
@@ -168,7 +161,7 @@ class MiniIndex {
     // ivf->invlists = ils;
     const inv = {};
     inv.h = this.readH();
-    console.log('h', inv.h)
+    console.log("h", inv.h);
     if (inv.h !== "ilar") {
       console.warn("invlist wrong, ", inv.h);
     }
@@ -188,7 +181,7 @@ class MiniIndex {
       index.codeSize = index.d * 32;
       this.readInvertedLists(index);
 
-      console.log('Finished check:', this.p === this.data.byteLength)
+      console.log("Finished check:", this.p === this.data.byteLength);
     } else if (h === "IxF2" || h === "IxFI") {
       this.readIndexHeader(index);
       this.readXbVectors(index);
