@@ -28,9 +28,9 @@ class MiniIndex {
     return int8;
   }
   readUint8() {
-    const int8 = this.dataview.getUint8(this.p, true);
+    const uint8 = this.dataview.getUint8(this.p, true);
     this.p += 1;
-    return int8;
+    return uint8;
   }
   readBool() {
     const int8 = this.readInt8();
@@ -41,9 +41,14 @@ class MiniIndex {
     this.p += 4;
     return int32;
   }
-  readInt64() {
-    const left = this.readInt32();
-    const right = this.readInt32();
+  readUint32() {
+    const uint32 = this.dataview.getUint32(this.p, true);
+    this.p += 4;
+    return uint32;
+  }
+  readUint64() {
+    const left = this.readUint32();
+    const right = this.readUint32();
     const int64 = left + Math.pow(2, 32) * right;
     if (!Number.isSafeInteger(int64))
       console.warn(int64, "exceeds MAX_SAFE_INTEGER. Precision may be lost");
@@ -54,8 +59,8 @@ class MiniIndex {
     this.p += n * 4;
     return res;
   }
-  readInt64Array(n) {
-    const res = generateArray(n).map((_) => this.readInt64());
+  readUint64Array(n) {
+    const res = generateArray(n).map((_) => this.readUint64());
     return res;
   }
   readH() {
@@ -64,20 +69,20 @@ class MiniIndex {
     return h;
   }
   readDummy() {
-    const dummy = this.readInt64();
+    const dummy = this.readUint64();
     return dummy;
   }
   readIndexHeader(index) {
-    index.d = this.readInt32();
+    index.d = this.readUint32();
     // console.log("d", index.d);
-    index.ntotal = this.readInt64();
+    index.ntotal = this.readUint64();
     // console.log("ntotal", index.ntotal);
     let dummy_0 = this.readDummy();
     let dummy_1 = this.readDummy();
     console.log("  dummy check", dummy_0 === dummy_1);
     index.isTrained = this.readBool();
     // console.log("isTrained", index.isTrained);
-    const metricTypeNum = this.readInt32();
+    const metricTypeNum = this.readUint32();
     const metricType = num2MetricType(metricTypeNum);
     index.metricType = metricTypeNum;
     index._metricType = metricType;
@@ -101,7 +106,7 @@ class MiniIndex {
       console.warn("directmap type only supports NoMap.");
     }
 
-    directMap.size = this.readInt64();
+    directMap.size = this.readUint64();
 
     // directMap.array = new BigInt64Array(
     //   this.data.slice(this.p, this.p + index.ntotal * 8)
@@ -111,16 +116,16 @@ class MiniIndex {
   }
   readIvfHeader(index) {
     this.readIndexHeader(index);
-    index.nlist = this.readInt64();
+    index.nlist = this.readUint64();
     // console.log("nlist", index.nlist);
-    index.nprobe = this.readInt64();
+    index.nprobe = this.readUint64();
     // console.log("nprobe", index.nprobe);
     index.ivf_index = {};
     this.readIndex(index.ivf_index);
     this.readDirectMap(index);
   }
   readXbVectors(index) {
-    const size = this.readInt64();
+    const size = this.readUint64();
     index._codesSize = size;
 
     // const codes = new Float32Array(this.data.slice(this.p, this.p + size * 4));
@@ -137,9 +142,9 @@ class MiniIndex {
     if (inv.listType !== "full") {
       console.warn("inv listType only supports full, not sprs");
     }
-    inv.listSizeSize = this.readInt64();
+    inv.listSizeSize = this.readUint64();
     const listSizes = generateArray(inv.listSizeSize).map((_) =>
-      this.readInt64()
+      this.readUint64()
     );
     inv.listSizes = listSizes;
     const ids = [];
@@ -150,7 +155,7 @@ class MiniIndex {
           this.readFloat32Array(inv.codeSize / 4)
         )
       );
-      ids.push(this.readInt64Array(listSizes[i]));
+      ids.push(this.readUint64Array(listSizes[i]));
     }
     // console.log(ids[0])
     // console.log(codes[0])
@@ -165,8 +170,8 @@ class MiniIndex {
     if (inv.h !== "ilar") {
       console.warn("invlist wrong, ", inv.h);
     }
-    inv.nlist = this.readInt64();
-    inv.codeSize = this.readInt64();
+    inv.nlist = this.readUint64();
+    inv.codeSize = this.readUint64();
 
     this.readArrayInvertedListsSizes(inv);
 
